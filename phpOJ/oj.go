@@ -6,6 +6,10 @@ import (
 	"os/exec"
 )
 
+const (
+	shellPath = "./shell"
+)
+
 func Run() {
 	// os.Chdir("../shell")
 	params := make([]string, 2)
@@ -38,4 +42,9 @@ func execCommand(commandName string, params []string) bool {
 	}
 	fmt.Println(out.String())
 	return true
+}
+
+//the entrance of it package
+func Main() {
+	Run()
 }
