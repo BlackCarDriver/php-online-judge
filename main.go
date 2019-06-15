@@ -1,9 +1,9 @@
 package main
 
-import(
-	"./PhpOJ"
+import (
+	oj "./phpOJ"
 )
 
-func main(){
+func main() {
 	oj.Run()
 }

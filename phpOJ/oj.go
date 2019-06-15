@@ -9,15 +9,7 @@ import (
 func Run() {
 	// os.Chdir("../shell")
 	params := make([]string, 2)
-	params[0] = "-c"
-	params[1] = `
-	PHP=$(pwd)
-	docker run --name php \
-		--rm \
-		-i \
-		-v $PHP/code:/code \
-		php \
-		php /code/index.php`
+	params[0] = "./phpOJ/shell/dockerRunPHP.sh"
 	// params[1] = "php.sh"
 	execCommand("bash", params)
 }
@@ -26,7 +18,7 @@ func execCommand(commandName string, params []string) bool {
 	cmd := exec.Command(commandName, params...)
 
 	//显示运行的命令
-	fmt.Println(cmd.Args)
+	//fmt.Println(cmd.Args)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
