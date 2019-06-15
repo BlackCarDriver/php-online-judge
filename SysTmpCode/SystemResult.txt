@@ -1,1 +1,1 @@
-
+Array ( [0] => Array ( [0] => <p>下面是一个CentOS7的Dockerfile实例</p> [1] => <p>==================== </p> [2] => <p>在Dockerfile中每执行一条指令（ENV、ADD、RUN等命令），都会生成一个docker image layer</p> [3] => <p>可以看到每执行一条Dockerfile的指令都会生成一个镜像的layer <code>c57a5bac41c8 185ef7b101a8</code> 最后<code>185ef7b101a8</code>这个是docker镜像的ID,<code>185ef7b101a8</code>是由<code>c57a5bac41c8</code> 、<code>185ef7b101a8…</code>layers叠加而成，体现了docker镜像是分层的</p> [4] => <p><code>docker exec -it centos7 base /bin/bash</code></p> [5] => <p>专栏达人</p> [6] => <p>持之以恒</p> [7] => <p>1</p> ) )

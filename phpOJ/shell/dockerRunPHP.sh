@@ -4,5 +4,5 @@ PHP=$(pwd)
 		-i \
 		-v $PHP/UserCode:/UserCode \
 		-v $PHP/SysTmpCode:/SysTmpCode \
-		php \
-		bin/bash /SysTmpCode/runPHPCode.sh
+		php:alpine \
+		bin/sh /SysTmpCode/runPHPCode.sh
