@@ -6,9 +6,13 @@ import (
 	"os/exec"
 )
 
+const (
+	shellPath = "./shell"
+)
+
 func Run() {
 	// os.Chdir("../shell")
-	params := make([]string, 2)
+	params := make([]string, 1)
 	params[0] = "./phpOJ/shell/dockerRunPHP.sh"
 	// params[1] = "php.sh"
 	execCommand("bash", params)
@@ -28,6 +32,11 @@ func execCommand(commandName string, params []string) bool {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		return false
 	}
-	fmt.Println(out.String())
+	fmt.Print(out.String())
 	return true
+}
+
+//the entrance of it package
+func Main() {
+	Run()
 }

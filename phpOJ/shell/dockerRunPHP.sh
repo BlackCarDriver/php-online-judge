@@ -1,7 +1,8 @@
 PHP=$(pwd)
-	sudo docker run --name php \
+	sudo docker run \
 		--rm \
 		-i \
-		-v $PHP/code:/code \
+		-v $PHP/UserCode:/UserCode \
+		-v $PHP/SysTmpCode:/SysTmpCode \
 		php \
-		php ./code/test-UserCode.php
+		bin/bash /SysTmpCode/runPHPCode.sh
