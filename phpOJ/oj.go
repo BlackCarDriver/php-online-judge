@@ -8,7 +8,27 @@ import (
 
 const (
 	shellPath = "./shell"
+	configPath = "./phpOJ/conf/"
 )
+
+var (
+	phpConf ConfigMachine
+)
+
+func init(){
+	var err error
+	phpConf,err = NewConfig(configPath)
+	handleErr("NewConfig(configPath)", err, true)
+	err = phpConf.Register("test","",true)
+	if handleErr("Register", err, false) == false {
+		phpConf.Display()
+	}
+}
+
+//the entrance of it package
+func Main() {
+	Run()
+}
 
 func Run() {
 	// os.Chdir("../shell")
@@ -36,7 +56,3 @@ func execCommand(commandName string, params []string) bool {
 	return true
 }
 
-//the entrance of it package
-func Main() {
-	Run()
-}
