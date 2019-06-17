@@ -1,3 +1,4 @@
+
 <?php 
 //设置最大执行时间
 set_time_limit(0);
@@ -24,9 +25,16 @@ function getHtml($url){
 function getPageData($url){
   // 获取整个网页内容
   $html = getHtml($url);
-  preg_match_all("/<p>.*<\/p>/",$html,$result_array);
+  preg_match_all("/<p.*>.*<\/p>/",$html,$result_array);
   return $result_array;
 }
-print_r(getPageData("https://blog.csdn.net/qq_34409701/article/details/79949401"));
+
+$arr = getPageData("https://blog.csdn.net/YDTG1993/article/details/83861629");
+foreach($arr as $value){
+  foreach($value as $v){
+      echo $v;
+      echo "\n";
+  }
+}
 
 ?>

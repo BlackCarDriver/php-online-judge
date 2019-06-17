@@ -1,16 +1,16 @@
-package oj
+package phpOJ
 
-import(
+import (
 	"fmt"
+	"io"
+	"os"
 	"reflect"
 	"strconv"
-	"os"
-	"io"
-	
-	"errors"
-	"strings"
+
 	"bufio"
+	"errors"
 	"regexp"
+	"strings"
 )
 
 //recorde the filename that alread read, each file can only read once
@@ -19,44 +19,44 @@ var readHistory = make(map[string]bool)
 /*
 explain of Config struct:
 	configPath is the root path of config files, all files with suffix ".conf" will be parse into rawConf
-when the struct is init. 
+when the struct is init.
 	rawConf is the map tmpely saving the string that read from config files, those string will not be
 used until you register then.
 	ripeConf is the map saving config value, those config is read from rawConf through Register()
 */
-type Config struct{
+type Config struct {
 	configPath string
-	rawConf map[string]string 
-	ripeConf map[string]interface{}
+	rawConf    map[string]string
+	ripeConf   map[string]interface{}
 }
 
 type ConfigMachine interface {
 	InitWithFilesPath(filesPath string) error
-	Register(keyName string , dfValue interface{}, isImportant bool) error
+	Register(keyName string, dfValue interface{}, isImportant bool) error
 	Get(keyName string) (value interface{}, err error)
-	Display() 
+	Display()
 }
 
 //the mainly way of obtain a Config
-func NewConfig(confPath string)(ConfigMachine, error) {
+func NewConfig(confPath string) (ConfigMachine, error) {
 	newMachine := new(Config)
 	err := newMachine.InitWithFilesPath(confPath)
-	return newMachine,err
+	return newMachine, err
 }
 
 //=========== method in interface ===============
-func (c *Config) InitWithFilesPath(Configpath string) error{
+func (c *Config) InitWithFilesPath(Configpath string) error {
 	if c.configPath != "" {
 		return errors.New("You can't init the Confi twice!")
 	}
 	c.rawConf = make(map[string]string)
-	c.ripeConf = make(map[string]interface{}) 
-	c.configPath = Configpath;
+	c.ripeConf = make(map[string]interface{})
+	c.configPath = Configpath
 	errList := c.readAllConfig()
 	return errList
 }
 
-func (c *Config) Get(keyName string)(value interface{}, err error){
+func (c *Config) Get(keyName string) (value interface{}, err error) {
 	if !isLegalName(keyName) {
 		err = errors.New("keyName is not right!")
 		return
@@ -65,12 +65,12 @@ func (c *Config) Get(keyName string)(value interface{}, err error){
 	if !ok {
 		err = fmt.Errorf("KeyName %v not found in config list!", keyName)
 	}
-	return 
+	return
 }
 
-func (c *Config) Register(confName string, dfValue interface{}, isStrict bool)( err error ){
+func (c *Config) Register(confName string, dfValue interface{}, isStrict bool) (err error) {
 	rawStr, ok := c.rawConf[confName]
-	if !ok && isStrict {	
+	if !ok && isStrict {
 		err = fmt.Errorf("Config %v don't exit !", confName)
 		return
 	}
@@ -81,44 +81,44 @@ func (c *Config) Register(confName string, dfValue interface{}, isStrict bool)( 
 	tyName := reflect.TypeOf(dfValue).String()
 	switch tyName {
 	case "int":
-		tmpInt,err := strconv.Atoi(rawStr)
+		tmpInt, err := strconv.Atoi(rawStr)
 		if err != nil {
 			return err
 		}
 		c.ripeConf[confName] = tmpInt
-		break;
+		break
 
 	case "string":
 		c.ripeConf[confName] = rawStr
-		break;
+		break
 
-	case "float64": 
-		tmpFloat,err := strconv.ParseFloat(rawStr, 64)
+	case "float64":
+		tmpFloat, err := strconv.ParseFloat(rawStr, 64)
 		if err != nil {
 			return err
 		}
 		c.ripeConf[confName] = tmpFloat
-		break;
+		break
 
-	case "bool":  
+	case "bool":
 		tmpBool, err := strconv.ParseBool(rawStr)
 		if err != nil {
-			return err  
+			return err
 		}
 		c.ripeConf[confName] = tmpBool
-		break;
+		break
 
 	case "[]string":
-		tmpStr := strings.Trim(rawStr,`"`)
+		tmpStr := strings.Trim(rawStr, `"`)
 		c.ripeConf[confName] = strings.Split(tmpStr, `","`)
-		break;
+		break
 
 	case "[]int":
-		tmpArry := strings.Split(rawStr,",")
+		tmpArry := strings.Split(rawStr, ",")
 		tmpIntArry := make([]int, 0)
-		for _,strInt := range tmpArry {
+		for _, strInt := range tmpArry {
 			tmpInt, err := strconv.Atoi(strInt)
-			if err!=nil {
+			if err != nil {
 				return err
 			}
 			tmpIntArry = append(tmpIntArry, tmpInt)
@@ -127,32 +127,29 @@ func (c *Config) Register(confName string, dfValue interface{}, isStrict bool)( 
 		break
 
 	default:
-		return  fmt.Errorf("Unsupport type : %v", tyName)
+		return fmt.Errorf("Unsupport type : %v", tyName)
 	}
 	return nil
 }
 
 //display the key name and value name in rawMap and ripeMap
-func (c *Config) Display(){
+func (c *Config) Display() {
 	fmt.Println("============= rawConf ======== ")
-	for k,v := range c.rawConf {
-	 	fmt.Printf(" %v -->  %v \n", k,v)
+	for k, v := range c.rawConf {
+		fmt.Printf(" %v -->  %v \n", k, v)
 	}
-	fmt.Println( "============ ripefMap ========" )
-	for k,v := range c.ripeConf {
-		fmt.Printf(" %v -->  %v \n", k,v)
+	fmt.Println("============ ripefMap ========")
+	for k, v := range c.ripeConf {
+		fmt.Printf(" %v -->  %v \n", k, v)
 	}
 }
-
-
-
 
 //=============== tools function ==========
 
 //read all files with .conf suffix in configPath
-func (c *Config)readAllConfig() error {
+func (c *Config) readAllConfig() error {
 	filesPath := c.configPath
-	file ,err := os.Open( filesPath )
+	file, err := os.Open(filesPath)
 	if err != nil {
 		return err
 	}
@@ -170,7 +167,7 @@ func (c *Config)readAllConfig() error {
 		//guarante each file only read one times
 		if readHistory[info.Name()] {
 			errReport += fmt.Sprintf("can not read %v, already read before...", info.Name())
-			continue;
+			continue
 		}
 		readHistory[info.Name()] = true
 		tmpPath := filesPath + info.Name()
@@ -179,86 +176,86 @@ func (c *Config)readAllConfig() error {
 			errReport += fmt.Sprintf("\n %v", err)
 		}
 	}
-	if errReport == ""{
+	if errReport == "" {
 		return nil
 	}
 	return errors.New(errReport)
 }
 
 //read a config file and save message into Conf.rawMap
-func (c *Config)readConfig(path string) error {
-	file,err := os.Open(path)
+func (c *Config) readConfig(path string) error {
+	file, err := os.Open(path)
 	if handleErr("os.Open(path) ", err, false) {
 		return err
 	}
 	defer file.Close()
 	buf := bufio.NewReader(file)
-	for{
+	for {
 		lineByte, _, err := buf.ReadLine()
-		line := strings.TrimSpace( string(lineByte) )
-		if err == io.EOF {	//end of file
+		line := strings.TrimSpace(string(lineByte))
+		if err == io.EOF { //end of file
 			break
 		}
-		if err != nil {		//other error
+		if err != nil { //other error
 			fmt.Println(err)
 			return err
 		}
-		if line == "" {		//ignore empty line
+		if line == "" { //ignore empty line
 			continue
 		}
-		if strings.HasPrefix(line, "#") {	//ignore cmment
+		if strings.HasPrefix(line, "#") { //ignore cmment
 			continue
 		}
 		index := strings.Index(line, "=")
-		if index <= 0 {						//unknow format
-			return errors.New("Reading config was interupt because unexpect fomat of config (index <= 0): " +  string(lineByte) )
+		if index <= 0 { //unknow format
+			return errors.New("Reading config was interupt because unexpect fomat of config (index <= 0): " + string(lineByte))
 		}
 		confName := strings.TrimSpace(line[:index])
 		confValue := strings.TrimSpace(line[index+1:])
-		if len(confName) == 0 || len(confValue) == 0 {	//unknow format
-			return errors.New("Reading config was interupt because unexpect fomat of config (len==0): " +  string(lineByte) )
+		if len(confName) == 0 || len(confValue) == 0 { //unknow format
+			return errors.New("Reading config was interupt because unexpect fomat of config (len==0): " + string(lineByte))
 		}
 
-		if isLegalName(confName) == false {				//config name not legal
-			return errors.New("Config Name not legal at line : " + string(lineByte) )
+		if isLegalName(confName) == false { //config name not legal
+			return errors.New("Config Name not legal at line : " + string(lineByte))
 		}
 
-		if isStringType(confValue) {	//match string type
+		if isStringType(confValue) { //match string type
 			confValue = strings.Trim(confValue, `"`)
 			goto saveConf
 		}
 
-		if isNumberType(confValue) {	//match int or float type
+		if isNumberType(confValue) { //match int or float type
 			goto saveConf
 		}
 
-		if confValue=="true" || confValue == "false" {	//match bool type
+		if confValue == "true" || confValue == "false" { //match bool type
 			goto saveConf
 		}
 		//read an multi line string to rawMap, dont
-		if confValue == `{`	 {		
+		if confValue == `{` {
 			tmpStr := ""
 			for {
 				tmplineByte, _, tmpErr := buf.ReadLine()
-				if tmpErr != nil { 	
+				if tmpErr != nil {
 					return fmt.Errorf("Readding worng by mistack after ‘%v’ , error: %v ", string(lineByte), tmpErr)
 				}
 				tmpline := string(tmplineByte)
 				if strings.HasPrefix(strings.TrimSpace(tmpline), `}`) {
 					break
 				}
-				tmpStr += tmpline 
+				tmpStr += tmpline
 				tmpStr += "\n"
 			}
 			confValue = tmpStr
 			goto saveConf
-		}	
+		}
 
-		if confValue == "[" {		//mathch an array
+		if confValue == "[" { //mathch an array
 			tmpStr := ""
 			for {
 				tmplineByte, _, tmpErr := buf.ReadLine()
-				if tmpErr != nil { 	
+				if tmpErr != nil {
 					return fmt.Errorf("Unexpect error when reading array type config in or near : ‘%v’, error: %v ", string(lineByte), tmpErr)
 				}
 				tmpline := string(tmplineByte)
@@ -282,20 +279,20 @@ func (c *Config)readConfig(path string) error {
 	return nil
 }
 
-func handleErr(prefix string ,err error, isSeriou bool) ( errNotNull bool) {
+func handleErr(prefix string, err error, isSeriou bool) (errNotNull bool) {
 	if err == nil {
 		return false
 	}
-	fmt.Println(prefix , err)
+	fmt.Println(prefix, err)
 	if isSeriou {
 		os.Exit(2)
 	}
-	return true	 
+	return true
 }
 
 //judge if a name of config is legal
 func isLegalName(confName string) bool {
-	legalNameReg, _ := regexp.Compile(`^[a-zA-Z0-9_]+$`) 
+	legalNameReg, _ := regexp.Compile(`^[a-zA-Z0-9_]+$`)
 	isLegal := legalNameReg.MatchString(confName)
 	return isLegal
 }
@@ -315,17 +312,16 @@ func isStringType(confValue string) bool {
 func isNumberType(confValue string) bool {
 	_, isInt := strconv.Atoi(confValue)
 	_, isFlo := strconv.ParseFloat(confValue, 64)
-	return (isInt==nil || isFlo==nil)
+	return (isInt == nil || isFlo == nil)
 }
 
 //==========================================================
 
-
 //the useage of config package
-func example(){
+func example() {
 	//create an config object by giving config path
-	tc,err := NewConfig("./config/conf/")
-	if err!=nil {
+	tc, err := NewConfig("./config/conf/")
+	if err != nil {
 		fmt.Println("the following is the errors during reading config file :")
 		fmt.Println(err)
 	}
@@ -337,20 +333,20 @@ func example(){
 	tc.Register("t_int", 0, true)
 	tc.Register("t_float", 0.1, true)
 	tc.Register("t_bool", false, true)
-	tc.Register("t_str_arry", make([]string,1), true)
+	tc.Register("t_str_arry", make([]string, 1), true)
 	tc.Register("t_int_array", make([]int, 1), true)
 	//register a new config key that don't exist in config file by setting isStrict = false
 	tc.Register("newCOnfig", "t_muti_string", false)
-	
+
 	//display the config in map
 	tc.Display()
 
 	//get a config value by configName
 	paragraph, err := tc.Get("t_muti_string")
-	if err!=nil {
+	if err != nil {
 		fmt.Println(err)
-	}else{
+	} else {
 		fmt.Println(paragraph)
 	}
-	
+
 }

@@ -1,4 +1,4 @@
-package oj
+package phpOJ
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	shellPath = "./shell"
+	shellPath  = "./shell"
 	configPath = "./phpOJ/conf/"
 )
 
@@ -15,27 +15,14 @@ var (
 	phpConf ConfigMachine
 )
 
-func init(){
+func init() {
 	var err error
-	phpConf,err = NewConfig(configPath)
+	phpConf, err = NewConfig(configPath)
 	handleErr("NewConfig(configPath)", err, true)
-	err = phpConf.Register("test","",true)
+	err = phpConf.Register("test", "", true)
 	if handleErr("Register", err, false) == false {
 		phpConf.Display()
 	}
-}
-
-//the entrance of it package
-func Main() {
-	Run()
-}
-
-func Run() {
-	// os.Chdir("../shell")
-	params := make([]string, 1)
-	params[0] = "./phpOJ/shell/dockerRunPHP.sh"
-	// params[1] = "php.sh"
-	execCommand("bash", params)
 }
 
 func execCommand(commandName string, params []string) bool {
@@ -56,3 +43,8 @@ func execCommand(commandName string, params []string) bool {
 	return true
 }
 
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

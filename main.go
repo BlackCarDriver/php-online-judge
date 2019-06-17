@@ -1,7 +1,8 @@
 package main
 
-import oj "./phpOJ"
+import "./phpOJ"
 
 func main() {
-	oj.Main()
+	phpOJ.GenerateProject1Code()
+	phpOJ.RunProject1()
 }
