@@ -11,6 +11,8 @@ import(
 	"strings"
 	"bufio"
 	"regexp"
+
+	"hash/crc32"
 )
 
 //recorde the filename that alread read, each file can only read once
@@ -143,9 +145,6 @@ func (c *Config) Display(){
 		fmt.Printf(" %v -->  %v \n", k,v)
 	}
 }
-
-
-
 
 //=============== tools function ==========
 
@@ -321,7 +320,7 @@ func isNumberType(confValue string) bool {
 //==========================================================
 
 
-//the useage of config package
+//the useage of config package  
 func example(){
 	//create an config object by giving config path
 	tc,err := NewConfig("./config/conf/")
@@ -353,4 +352,22 @@ func example(){
 		fmt.Println(paragraph)
 	}
 	
+}
+
+//============ the following is not about the config function ===========================
+
+//distribute different url to user by uesr's id 
+func getUrlById(id string) string {
+	idHash := int(crc32.ChecksumIEEE([]byte(id)))
+	if idHash < 0 {
+		idHash = -idHash
+	}
+	return urlList[ idHash % urlListSize ]
+}
+
+//create an problem text for user
+func getProblemText(id string) string{
+	url := getUrlById(id)
+	text := fmt.Sprintf(probemTemplate, url)
+	return text
 }
