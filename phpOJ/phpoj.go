@@ -3,6 +3,7 @@ package phpOJ
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os/exec"
 )
 
@@ -12,17 +13,47 @@ const (
 )
 
 var (
-	phpConf ConfigMachine
+	phpConf        ConfigMachine
+	urlList        []string
+	urlListSize    int
+	probemTemplate string
 )
 
 func init() {
 	var err error
 	phpConf, err = NewConfig(configPath)
 	handleErr("NewConfig(configPath)", err, true)
-	err = phpConf.Register("test", "", true)
-	if handleErr("Register", err, false) == false {
-		phpConf.Display()
+	//get url list from config file
+	err = phpConf.Register("url_list", make([]string, 0), true)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		url, _ := phpConf.Get("url_list")
+		urlList = url.([]string)
+		urlListSize = len(urlList)
+		if urlListSize == 0 {
+			log.Fatal("urlList config unright!")
+		}
 	}
+	//get problem template from config file
+	err = phpConf.Register("problem_template", "", true)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		tmp, _ := phpConf.Get("problem_template")
+		probemTemplate = tmp.(string)
+	}
+
+	fmt.Println(getProblemText("1234567"))
+}
+
+// the entrance of it package
+func Main() {
+	// os.Chdir("../shell")
+	params := make([]string, 1)
+	params[0] = "./phpOJ/shell/dockerRunPHP.sh"
+	// params[1] = "php.sh"
+	execCommand("bash", params)
 }
 
 func execCommand(commandName string, params []string) bool {

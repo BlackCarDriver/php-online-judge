@@ -1,3 +1,32 @@
-this is user code
-this is user test line 
- 
+
+<p> </p>
+<p>项目地址 <a href="https://github.com/ydtg1993/server" rel="nofollow">https://github.com/ydtg1993/server</a></p>
+<p><em><strong>使用docker搭建灵活的线上php环境 有时候不太需要一些别人已经集成了的包或者镜像 我们就可以使用以下方式逐一构建自己所需要的环境结构</strong></em></p>
+<p><code>sudo docker pull php:7.2-fpm</code> 冒号后选择版本</p>
+<p><code>sudo docker pull nginx</code></p>
+<p><code>sudo docker pull mysql:8.0 </code>不需要本地数据库可忽略</p>
+<p><code>sudo docker pull redis:3.2 </code>不需要本地redis可忽略</p>
+<p><code>sudo docker images</code> 查看已下载的所有镜像</p>
+<p><u><em>以下采用--link方式创建容器 注意创建顺序</em></u></p>
+<p>[运行mysql容器]</p>
+<p>[运行redis容器]</p>
+<p>[运行php容器]     <u><em>如果不需要搭建本地数据库或者redis可以省去--link mydb:mydb --link myredis:myredis</em></u></p>
+<p>[运行nginx容器]</p>
+<p>sudo docker ps -a 查看已创建容器</p>
+<p><strong><code>方法一：</code></strong></p>
+<p><code>`tar zxvf /server/php_lib/redis-4.1.0.tgz`</code></p>
+<p><code>`sudo docker cp /server/php_lib/redis-4.1.0 myphp:/usr/src/php/ext/redis`</code></p>
+<p><code>装完扩展 退出容器 重启容器</code></p>
+<p><code>`docker restart myphp`</code></p>
+<p><code>`docker rm $(docker ps -aq)`  删除所有容器</code></p>
+<p><code>`docker inspect myphp`  查看容器配置信息</code></p>
+<p> </p>
+<p> </p>
+<p> </p>
+<p class="text-center">没有更多推荐了，<a href="https://blog.csdn.net/" class="c-blue c-blue-hover c-blue-focus">返回首页</a></p>
+<p class="read">阅读数 <span>400</span></p>
+<p class="read">阅读数 <span>144</span></p>
+<p class="read">阅读数 <span>132</span></p>
+<p class="read">阅读数 <span>59</span></p>
+<p class="read">阅读数 <span>24</span></p>
+<p>0</p>

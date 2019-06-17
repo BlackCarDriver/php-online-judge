@@ -6,11 +6,13 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"bufio"
 	"errors"
 	"regexp"
-	"strings"
+
+	"hash/crc32"
 )
 
 //recorde the filename that alread read, each file can only read once
@@ -349,4 +351,22 @@ func example() {
 		fmt.Println(paragraph)
 	}
 
+}
+
+//============ the following is not about the config function ===========================
+
+//distribute different url to user by uesr's id
+func getUrlById(id string) string {
+	idHash := int(crc32.ChecksumIEEE([]byte(id)))
+	if idHash < 0 {
+		idHash = -idHash
+	}
+	return urlList[idHash%urlListSize]
+}
+
+//create an problem text for user
+func getProblemText(id string) string {
+	url := getUrlById(id)
+	text := fmt.Sprintf(probemTemplate, url)
+	return text
 }

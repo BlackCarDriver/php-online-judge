@@ -2,7 +2,9 @@ package phpOJ
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -35,11 +37,23 @@ func GenerateProject1Code() {
 	checkErr(err)
 }
 
-func CheckProject1Answer() bool {
-	defer func() {
-		if err, ok := recover().(error); ok {
-			fmt.Println(err)
-		}
-	}()
+func CheckProject1Answer() (b bool, err error) {
 
+	sysResult, err := ioutil.ReadFile("./phpOJ/subject-1/SysTmpCode/SystemResult.txt")
+	if err != nil {
+		return
+	}
+	userResult, err := ioutil.ReadFile("./phpOJ/subject-1/SysTmpCode/zzm/UserResult.txt")
+	if err != nil {
+		return
+	}
+	sys := strings.Split(string(sysResult), "\n")
+	user := string(userResult)
+	for _, v := range sys {
+		if !strings.Contains(user, v) {
+			b = false
+		}
+	}
+	b = true
+	return
 }
