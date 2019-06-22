@@ -21,7 +21,7 @@ func GenerateProject1Code() {
 	checkErr(err)
 	defer phpfile.Close()
 	url := "https://blog.csdn.net/YDTG1993/article/details/83861629"
-	tmpl, err := template.ParseFiles("php-template.txt")
+	tmpl, err := template.ParseFiles("./phpOJ/subject-1/SysTmpCode/php-template.txt")
 	checkErr(err)
 	err = tmpl.Execute(phpfile, url)
 	checkErr(err)
