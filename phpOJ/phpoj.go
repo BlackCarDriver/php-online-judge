@@ -18,9 +18,13 @@ var (
 	urlListSize    int
 	probemTemplate string
 	gitUrlTemplate	string
+	userCodePath	string
 )
 
 func init() {
+	//init config values directly 
+	userCodePath = `./UserCode`	
+
 	var err error
 	phpConf, err = NewConfig(configPath)
 	handleErr("NewConfig(configPath)", err, true)
@@ -52,7 +56,10 @@ func init() {
 		tmp, _ := phpConf.Get("gitUrl_template")
 		gitUrlTemplate = tmp.(string)
 	}
-	fmt.Println(getProblemText("1234567"))
+
+	// ================ the following is test code ==============
+
+	fmt.Println(getProblemText("UserName"))
 }
 
 // the entrance of it package
