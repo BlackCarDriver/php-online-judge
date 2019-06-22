@@ -388,8 +388,6 @@ func updataCodeById(id string) error {
 	args[0] = "-c"
 	args[1] = fmt.Sprintf(`cd %s && git clone %s`, userCodePath, gitUrl)
 
-	fmt.Println(args)
-	isScuess := execCommand("bash", args)
-	fmt.Println("result :", isScuess)
-	return nil
+	err := execCommand("bash", args)
+	return err
 }
