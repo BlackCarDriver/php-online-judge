@@ -365,7 +365,7 @@ func getUrlById(id string) string {
 }
 
 //get url of user's github
-func getGitUrlById(id string) string{
+func getGitUrlById(id string) string {
 	return fmt.Sprintf(gitUrlTemplate, id)
 }
 
@@ -380,13 +380,16 @@ func getProblemText(id string) string {
 	return text
 }
 
-//updata specified user's code in localhost from github  
-func updataCodeById(id string) error{
+//updata specified user's code in localhost from github
+func updataCodeById(id string) error {
 	gitUrl := getGitUrlById(id)
-	args := make([]string, 2)
-	args[0] = fmt.Sprintf("cd %s", userCodePath)
-	args[1] = fmt.Sprintf("git clone %s", gitUrl)
-	res := execCommand("bash", args)
-	fmt.Println("result : ", res)
+
+	args := make([]string, 3)
+	args[0] = "-c"
+	args[1] = fmt.Sprintf(`cd %s && git clone %s`, userCodePath, gitUrl)
+
+	fmt.Println(args)
+	isScuess := execCommand("bash", args)
+	fmt.Println("result :", isScuess)
 	return nil
 }
