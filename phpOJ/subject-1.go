@@ -1,7 +1,6 @@
 package phpOJ
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -13,40 +12,27 @@ func RunProject1() {
 	params := make([]string, 1)
 	params[0] = "./phpOJ/subject-1/SysTmpCode/dockerRunPHP.sh"
 	// params[1] = "php.sh"
-	execCommand("bash", params)
+	err := execCommand("bash", params)
+	checkErr(err)
 }
 
 func GenerateProject1Code() {
-	defer func() {
-		if err, ok := recover().(error); ok {
-			fmt.Println(err)
-		}
-	}()
-	path, err := os.Getwd()
+	phpfile, err := os.Create("./phpOJ/subject-1/SysTmpCode/SystemCode.php")
 	checkErr(err)
-	err = os.Chdir("./phpOJ/subject-1/SysTmpCode")
-	checkErr(err)
-	phpfile, err := os.Create("SystemCode.php")
-	checkErr(err)
+	defer phpfile.Close()
 	url := "https://blog.csdn.net/YDTG1993/article/details/83861629"
 	tmpl, err := template.ParseFiles("php-template.txt")
 	checkErr(err)
 	err = tmpl.Execute(phpfile, url)
 	checkErr(err)
-	err = os.Chdir(path)
-	checkErr(err)
 }
 
-func CheckProject1Answer() (b bool, err error) {
+func CheckProject1Answer() (b bool) {
 
 	sysResult, err := ioutil.ReadFile("./phpOJ/subject-1/SysTmpCode/SystemResult.txt")
-	if err != nil {
-		return
-	}
+	checkErr(err)
 	userResult, err := ioutil.ReadFile("./phpOJ/subject-1/SysTmpCode/zzm/UserResult.txt")
-	if err != nil {
-		return
-	}
+	checkErr(err)
 	sys := strings.Split(string(sysResult), "\n")
 	user := string(userResult)
 	for _, v := range sys {
