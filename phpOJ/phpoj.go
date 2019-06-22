@@ -17,6 +17,7 @@ var (
 	urlList        []string
 	urlListSize    int
 	probemTemplate string
+	gitUrlTemplate	string
 )
 
 func init() {
@@ -43,7 +44,14 @@ func init() {
 		tmp, _ := phpConf.Get("problem_template")
 		probemTemplate = tmp.(string)
 	}
-
+	//get github url template from config file
+	err = phpConf.Register("gitUrl_template", "", true)
+	if err!=nil {
+		log.Fatal(err)
+	}else{
+		tmp, _ := phpConf.Get("gitUrl_template")
+		gitUrlTemplate = tmp.(string)
+	}
 	fmt.Println(getProblemText("1234567"))
 }
 

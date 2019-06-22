@@ -364,9 +364,20 @@ func getUrlById(id string) string {
 	return urlList[idHash%urlListSize]
 }
 
-//create an problem text for user
+//get url of user's github
+func getGitUrlById(id string) string{
+	return fmt.Sprintf(gitUrlTemplate, id)
+}
+
+//create the describe text of problem for specified user
 func getProblemText(id string) string {
-	url := getUrlById(id)
-	text := fmt.Sprintf(probemTemplate, url)
+	problem_url := getUrlById(id)
+	github_url := getGitUrlById(id)
+	text := fmt.Sprintf(probemTemplate, problem_url, github_url)
 	return text
+}
+
+//updata specified user's code in localhost from github  
+func updataCodeById(id string){
+	
 }
