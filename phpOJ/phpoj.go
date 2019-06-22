@@ -71,7 +71,7 @@ func Main() {
 	execCommand("bash", params)
 }
 
-func execCommand(commandName string, params []string) bool {
+func execCommand(commandName string, params []string) (err error) {
 	cmd := exec.Command(commandName, params...)
 
 	//显示运行的命令
@@ -80,13 +80,13 @@ func execCommand(commandName string, params []string) bool {
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return false
+		return err
 	}
 	fmt.Print(out.String())
-	return true
+	return err
 }
 
 func checkErr(err error) {
