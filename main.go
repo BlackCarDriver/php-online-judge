@@ -4,39 +4,50 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"./phpOJ"
 )
 
 func main() {
-	defer func() {
-		if err, ok := recover().(error); ok {
-			fmt.Println(err)
-		}
-	}()
-	phpOJ.GenerateProject1Code()
-	phpOJ.RunProject1()
-	b := phpOJ.CheckProject1Answer()
-	fmt.Println(b)
+	// defer func() {
+	// 	if err, ok := recover().(error); ok {
+	// 		fmt.Println(err)
+	// 	}
+	// }()
+	// phpOJ.GenerateProject1Code()
+	// phpOJ.RunProject1()
+	// b := phpOJ.CheckProject1Answer()
+	// fmt.Println(b)
 
 	// models.InitDB()
-	// mux := http.NewServeMux()
+	mux := http.NewServeMux()
 
-	// mux.HandleFunc("/example", errorHander(example))
+	mux.HandleFunc("/example", errorHander(example))
 
-	// fmt.Println("http服务器启动，端口：8083")
-	// err := http.ListenAndServe(":8083", mux)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println("==")
+	fmt.Println("http服务器启动，端口：8083")
+	err := http.ListenAndServe(":8083", mux)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("==")
 }
 
 func example(w http.ResponseWriter, r *http.Request) {
 	setHeader(w)
-	//data := getBodyData(r)
-	fmt.Println("is Success")
+	data := getBodyData(r)
+	if userName, ok := data["userName"].(string); ok {
+		fmt.Println(userName)
+		phpOJ.GenerateProject1Code()
+		phpOJ.RunProject1()
+		b := phpOJ.CheckProject1Answer()
+		fmt.Println(b)
+	} else {
+		panic("type assertion has error")
+	}
+	// fmt.Println("is Success")
+
 }
 
 func setHeader(w http.ResponseWriter) {

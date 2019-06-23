@@ -3,7 +3,6 @@ package phpOJ
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os/exec"
 )
 
@@ -17,59 +16,59 @@ var (
 	urlList        []string
 	urlListSize    int
 	probemTemplate string
-	gitUrlTemplate	string
-	userCodePath	string
+	gitUrlTemplate string
+	userCodePath   string
 )
 
-func init() {
-	//init config values directly 
-	userCodePath = `./UserCode`	
+// func init() {
+// 	//init config values directly
+// 	userCodePath = `./UserCode`
 
-	var err error
-	phpConf, err = NewConfig(configPath)
-	handleErr("NewConfig(configPath)", err, true)
-	//get url list from config file
-	err = phpConf.Register("url_list", make([]string, 0), true)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		url, _ := phpConf.Get("url_list")
-		urlList = url.([]string)
-		urlListSize = len(urlList)
-		if urlListSize == 0 {
-			log.Fatal("urlList config unright!")
-		}
-	}
-	//get problem template from config file
-	err = phpConf.Register("problem_template", "", true)
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		tmp, _ := phpConf.Get("problem_template")
-		probemTemplate = tmp.(string)
-	}
-	//get github url template from config file
-	err = phpConf.Register("gitUrl_template", "", true)
-	if err!=nil {
-		log.Fatal(err)
-	}else{
-		tmp, _ := phpConf.Get("gitUrl_template")
-		gitUrlTemplate = tmp.(string)
-	}
+// 	var err error
+// 	phpConf, err = NewConfig(configPath)
+// 	handleErr("NewConfig(configPath)", err, true)
+// 	//get url list from config file
+// 	err = phpConf.Register("url_list", make([]string, 0), true)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	} else {
+// 		url, _ := phpConf.Get("url_list")
+// 		urlList = url.([]string)
+// 		urlListSize = len(urlList)
+// 		if urlListSize == 0 {
+// 			log.Fatal("urlList config unright!")
+// 		}
+// 	}
+// 	//get problem template from config file
+// 	err = phpConf.Register("problem_template", "", true)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	} else {
+// 		tmp, _ := phpConf.Get("problem_template")
+// 		probemTemplate = tmp.(string)
+// 	}
+// 	//get github url template from config file
+// 	err = phpConf.Register("gitUrl_template", "", true)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	} else {
+// 		tmp, _ := phpConf.Get("gitUrl_template")
+// 		gitUrlTemplate = tmp.(string)
+// 	}
 
-	// ================ the following is test code ==============
+// 	// ================ the following is test code ==============
 
-	fmt.Println(getProblemText("UserName"))
-}
+// 	//fmt.Println(getProblemText("UserName"))
+// }
 
 // the entrance of it package
-func Main() {
-	// os.Chdir("../shell")
-	params := make([]string, 1)
-	params[0] = "./phpOJ/shell/dockerRunPHP.sh"
-	// params[1] = "php.sh"
-	execCommand("bash", params)
-}
+// func Main() {
+// 	// os.Chdir("../shell")
+// 	params := make([]string, 1)
+// 	params[0] = "./phpOJ/shell/dockerRunPHP.sh"
+// 	// params[1] = "php.sh"
+// 	execCommand("bash", params)
+// }
 
 func execCommand(commandName string, params []string) (err error) {
 	cmd := exec.Command(commandName, params...)
