@@ -31,10 +31,7 @@ function getPageData($url){
 
 $arr = getPageData("https://blog.csdn.net/YDTG1993/article/details/83861629");
 foreach($arr as $value){
-  foreach($value as $v){
-      echo $v;
-      echo "\n";
-  }
+  echo json_encode($value);
 }
 
 ?>

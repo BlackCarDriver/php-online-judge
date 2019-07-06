@@ -11,14 +11,14 @@ const (
 	configPath = "./phpOJ/conf/"
 )
 
-var (
-	phpConf        ConfigMachine
-	urlList        []string
-	urlListSize    int
-	probemTemplate string
-	gitUrlTemplate string
-	userCodePath   string
-)
+// var (
+// 	phpConf        ConfigMachine
+// 	urlList        []string
+// 	urlListSize    int
+// 	probemTemplate string
+// 	gitUrlTemplate string
+// 	userCodePath   string
+// )
 
 // func init() {
 // 	//init config values directly
@@ -70,7 +70,7 @@ var (
 // 	execCommand("bash", params)
 // }
 
-func execCommand(commandName string, params []string) (err error) {
+func execCommand(commandName string, params []string) (result string, err error) {
 	cmd := exec.Command(commandName, params...)
 
 	//显示运行的命令
@@ -81,11 +81,10 @@ func execCommand(commandName string, params []string) (err error) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return err
+		result = fmt.Sprint(err) + ": " + stderr.String()
 	}
-	fmt.Print(out.String())
-	return err
+	result = out.String()
+	return
 }
 
 func checkErr(err error) {

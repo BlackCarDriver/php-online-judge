@@ -1,45 +1,64 @@
 package phpOJ
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 	"text/template"
 )
 
+//bin/sh -c 后面记得用单引号，巨坑
+// 最终输出是一个json格式
 const (
 	dockerRun = `
+	echo -n '{'
 	PHP=$(pwd)
 	sudo docker run \
 		--rm \
-		-i \
 		-v $PHP/UserCode:/UserCode \
 		-v $PHP/phpOJ/subject-1/SysTmpCode:/SysTmpCode \
 		php:alpine \
-		/bin/sh -c "\
+		/bin/sh -c '\
 
 			userResult=$(php /UserCode/zzm/test-UserCode.php); \
-			result=$(echo "$userResult" | grep "error:"); \
-			if [ "$result" != "" ];then \
-				echo $userResult; \
+			result=$(echo $userResult | grep "error:"); \
+			if [ $result != "" ];then \
+				echo -n "\"userResult\":\""; \
+				echo -n $userResult; \
+				echo -n "\","; \
 			else \
-				echo "$userResult" > /SysTmpCode/zzm/UserResult.txt; \
+				echo -n "\"userResult\":\""; \
+				echo -n $userResult; \
+				echo -n "\","; \
+				echo -n "\"systemResult\":"; \
 				sysResult=$(php /SysTmpCode/SystemCode.php); \
-				echo "$sysResult" > /SysTmpCode/SystemResult.txt; \
+				echo -n $sysResult; \
 			fi \
 
-		"
+		'; \
+	echo -n '}';
 	`
 )
 
+type Result struct {
+	UserResult   string   `json:"userResult"`
+	SystemResult []string `json:"systemResult"`
+}
+
 func RunProject1() {
-	// os.Chdir("../shell")
 	params := make([]string, 2)
 	params[0] = "-c"
 	params[1] = dockerRun
-	// params[1] = "php.sh"
-	err := execCommand("bash", params)
+	// re是一个json格式的结果
+	re, err := execCommand("bash", params)
 	checkErr(err)
+	var result Result
+	//将json转化为结构体
+	err = json.Unmarshal([]byte(re), &result)
+	checkErr(err)
+	fmt.Println(result)
 }
 
 func GenerateProject1Code() {
