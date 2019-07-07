@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
+	"time"
+	"os"
 	"./phpOJ"
 )
 
 func main() {
+	Server()
 	defer func() {
 		if err, ok := recover().(error); ok {
 			fmt.Println(err)
@@ -80,4 +82,80 @@ func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+
+//================================================================ 7-7
+
+func Server(){
+	mux := http.NewServeMux()
+	mux.HandleFunc("/getproblem", GetProblem)
+	mux.HandleFunc("/commit", Commit)
+
+	server := &http.Server{
+		Addr:           "localhost:6666",
+		ReadTimeout:    time.Second * 10,
+		WriteTimeout:   time.Second * 10,
+		Handler:        mux,
+		MaxHeaderBytes: 1 << 20,
+	}
+	fmt.Println("Begin to Listen!!")
+	err := server.ListenAndServe()
+	if err != nil {
+		fmt.Println(err)
+	}
+	os.Exit(0)
+}
+
+//http://localhost:6666/getproblem
+//provide the problem's data to defferent user and problem
+func GetProblem(w http.ResponseWriter, r *http.Request){
+	SetHeader(w)
+	body, _ := ioutil.ReadAll(r.Body)
+	if len(body)==0 {
+		return
+	}
+	ssmap := getBodyMap(body)
+	problemid := ssmap["pid"]
+	userid := ssmap["uid"]
+	tp := phpOJ.Problem{}
+	if problemid=="" || userid=="" {
+		WriteJson(w, tp)
+	}
+	tp = phpOJ.GetProblem(userid)
+	WriteJson(w, tp)
+}
+
+//http://localhost:6666/commit
+//pull or update user's code from github and then judge and return the result
+func Commit(w http.ResponseWriter, r *http.Request){
+	SetHeader(w)
+	body, _ := ioutil.ReadAll(r.Body)
+	if len(body)==0 {
+		return
+	}
+	ssmap := getBodyMap(body)
+	fmt.Println(ssmap)
+	//do something ....
+	WriteJson(w,"Accept")
+}
+
+func WriteJson(w http.ResponseWriter, data interface{}) {
+	jsondata, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.Write(jsondata)
+}
+
+func SetHeader(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "content-type")
+}
+
+//parse request.Body to an string-string map
+func getBodyMap(body []byte) map[string]string {
+	var postbody map[string]string
+	json.Unmarshal(body, &postbody)
+	return postbody
 }

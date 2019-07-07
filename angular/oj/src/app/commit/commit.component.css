@@ -1,0 +1,50 @@
+.mainbody{
+    background-color: #caf2d7;
+    padding: 10px;
+    padding-bottom: 100px;
+}
+.title{
+    padding: 20px 40px 10px 50px;
+    color: #293462;
+    margin: 0px
+}
+.static{
+    margin: 5px 20px;
+}
+
+.static ul{
+    font-size: 0.9em;
+    line-height: 0.9em;
+    display: inline-block;
+}
+
+.static p {
+    color: #60a9a6;
+    display: inline-block;
+}
+.box-a{
+    background-color: #f2f6f5;
+    margin: 10px 50px;
+    padding: 1px 20px;
+    min-height: 20px;
+}
+.que-text{
+    line-height: 1em;
+}
+#commit{
+    height: 30px;
+    width: 70px;
+    margin: 10px;
+    border-radius: 3px;
+    background-color: #60a9a6;
+    color: #f5fec0;
+}
+.result{
+    padding: 1px;
+    margin: 5px 10px 20px 10px;
+    color: #216583;
+}
+.tag{
+    color: #f96d15;
+    margin-left: 50px;
+}

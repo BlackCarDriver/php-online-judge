@@ -1,0 +1,29 @@
+<div class="mainbody">
+  <h2 class="title">PHP爬虫</h2>
+   <ul class="static">
+     <ul>创建时间： <p>{{tp.time}}</p> </ul>
+     <ul>题目类型： <p>{{tp.type}}</p> </ul>
+     <ul>知识点： <p>{{tp.tag}}</p> </ul>
+     <ul>答题次数： <p>{{tp.try}}</p></ul>
+     <ul>通过次数： <p>{{tp.ac}}</p></ul>
+     <ul>正确率： <p>{{tp.rate}}</p></ul>
+     <ul>难度： <p>{{tp.leave}}</p></ul>
+   </ul>
+   <h3 class="tag">题目描述</h3>
+   <div class="box-a">
+      <p class="que-text">
+        {{tp.text}}
+      </p>
+   </div>
+   <h3 class="tag">检验结果</h3>
+   <div class="box-a">
+      <button id="commit" (click)="commit()">我已提交</button>
+      <p class="result">
+        {{result}}
+      </p>
+   </div>
+   <h3 class="tag">提交历史</h3>
+   <div class="box-a">
+    {{history}}  
+   </div>
+</div>
