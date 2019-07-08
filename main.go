@@ -64,15 +64,7 @@ func checkErr(err error) {
 //provide the problem's data to defferent user and problem
 func GetProblem(w http.ResponseWriter, r *http.Request) {
 	setHeader(w)
-	// body, _ := ioutil.ReadAll(r.Body)
-	// if len(body) == 0 {
-	// 	return
-	// }
-	// ssmap := getBodyMap(body)
-	// problemid := ssmap["pid"]
-	// userid := ssmap["uid"]
 	body := getBodyData(r)
-	// uid, ok := body["uid"].(string)
 	pid, ok := body["pid"].(float64)
 	if !ok {
 		err := fmt.Errorf("type assertion has error")
@@ -97,12 +89,11 @@ func Commit(w http.ResponseWriter, r *http.Request) {
 	}
 	tp := models.SelectProblem(int(pid))
 	tu := models.SelectUser(uid)
-	// fmt.Println(tp)
-	// fmt.Println(tu)
 	phpOJ.GitPull(tu.Repository, tu.Openid)
 	phpOJ.GenerateProject1Code(tu.Openid, tp.CheckoutPath)
 	// defer phpOJ.GitCheckOut(tu.Openid)
 	result := phpOJ.RunProject1(tu.Openid, tp.CheckoutPath)
+
 	b := phpOJ.CheckProject1Answer(result)
 	WriteJson(w, b)
 }
@@ -113,16 +104,4 @@ func WriteJson(w http.ResponseWriter, data interface{}) {
 		fmt.Println(err)
 	}
 	w.Write(jsondata)
-}
-
-func SetHeader(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "content-type")
-}
-
-//parse request.Body to an string-string map
-func getBodyMap(body []byte) map[string]string {
-	var postbody map[string]string
-	json.Unmarshal(body, &postbody)
-	return postbody
 }

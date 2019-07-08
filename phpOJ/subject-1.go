@@ -12,7 +12,6 @@ import (
 // 最终输出是一个json格式
 const (
 	dockerRun = `
-	echo -n '{'
 	PHP=$(pwd)
 	sudo docker run \
 		--rm \
@@ -23,20 +22,14 @@ const (
 			userResult=$(php /Code/subject1.php); \
 			result=$(echo $userResult | grep "error:"); \
 			if [ $result != "" ];then \
-				echo -n "\"userResult\":\""; \
 				echo -n $userResult; \
-				echo -n "\","; \
 			else \
-				echo -n "\"userResult\":\""; \
-				echo -n $userResult; \
-				echo -n "\","; \
-				echo -n "\"systemResult\":"; \
+				echo $userResult; \
 				sysResult=$(php /Code/SystemCode.php); \
 				echo -n $sysResult; \
 			fi \
 
-		'; \
-	echo -n '}';
+		';
 	`
 )
 
@@ -52,11 +45,16 @@ func RunProject1(openid string, checkout_path string) (result Result) {
 	params[1] = dockerRun
 	params[2] = codeUrl
 	// re是一个json格式的结果
-	re, err := execCommand("bash", params)
+	r, err := execCommand("bash", params)
+	// fmt.Println(r)
 	checkErr(err)
+	re := strings.Split(r, "\n")
+	// fmt.Println(len(re))
+	result.UserResult = re[0]
+	json.Unmarshal([]byte(re[1]), &result.SystemResult)
 	//将json转化为结构体
-	err = json.Unmarshal([]byte(re), &result)
-	checkErr(err)
+	// err = json.Unmarshal([]byte(re), &result)
+	// checkErr(err)
 	fmt.Println(result)
 	return
 }
