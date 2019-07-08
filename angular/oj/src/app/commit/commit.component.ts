@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Problem,ServerService} from '../../server.service';
+import { Problem, ServerService } from '../../server.service';
 
 @Component({
   selector: 'app-commit',
@@ -9,39 +9,40 @@ import {Problem,ServerService} from '../../server.service';
 
 
 export class CommitComponent implements OnInit {
- constructor(private server:ServerService) { }
- tp = new Problem;
- result = "";
- history = "";
- problemid = "";
- userid = "";
-  
+  constructor(private server: ServerService) { }
+  tp = new Problem;
+  result = "";
+  history = "";
+  problemid: number;
+  userid = "";
+
   ngOnInit() {
     //从url地址获取题目id
-    this.problemid = "00001";
+    this.problemid = 1;
     //从cookie中获取用户id
-    this.userid = "000053";
+    this.userid = "kong0zhou";
     this.getProblemText();
     this.getHistroy();
   }
-  
+
   //将题目的详情显示到页面上
-  getProblemText(){
-    this.server.getProblem(this.problemid, this.userid).subscribe(result =>{
-        this.tp = result;
-      }
+  getProblemText() {
+    this.server.getProblem(this.problemid, this.userid).subscribe(result => {
+      this.tp = result;
+      console.log(JSON.stringify(this.tp))
+    }
     )
-  } 
+  }
 
   //通知后端判断上传的代码是否正确，又 题目id和用户id确定一个github 地址
-  commit(){
-    this.server.commit(this.problemid, this.userid).subscribe(result =>{
+  commit() {
+    this.server.commit(this.problemid, this.userid).subscribe(result => {
       this.result = result;
     }
-  )
+    )
   }
   //将用户的答题状况记录显示到页面上
-  getHistroy(){
+  getHistroy() {
     this.history = "时间： 2019-07-07 结果： 成功通过！";
   }
 }
