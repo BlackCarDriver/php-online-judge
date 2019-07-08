@@ -3,7 +3,6 @@ package phpOJ
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"text/template"
@@ -17,7 +16,7 @@ const (
 	PHP=$(pwd)
 	sudo docker run \
 		--rm \
-		-v $PHP+$0:/Code \
+		-v $PHP$0:/Code \
 		php:alpine \
 		/bin/sh -c '\
 
@@ -46,20 +45,20 @@ type Result struct {
 	SystemResult []string `json:"systemResult"`
 }
 
-func RunProject1(openid string, checkout_path string) {
+func RunProject1(openid string, checkout_path string) (result Result) {
 	codeUrl := fmt.Sprintf("/userData/%s%s", openid, checkout_path)
-	params := make([]string, 2)
+	params := make([]string, 3)
 	params[0] = "-c"
 	params[1] = dockerRun
 	params[2] = codeUrl
 	// re是一个json格式的结果
 	re, err := execCommand("bash", params)
 	checkErr(err)
-	var result Result
 	//将json转化为结构体
 	err = json.Unmarshal([]byte(re), &result)
 	checkErr(err)
 	fmt.Println(result)
+	return
 }
 
 func GenerateProject1Code(openid string, checkout_path string) {
@@ -74,16 +73,9 @@ func GenerateProject1Code(openid string, checkout_path string) {
 	checkErr(err)
 }
 
-func CheckProject1Answer() (b bool) {
-
-	sysResult, err := ioutil.ReadFile("./phpOJ/subject-1/SysTmpCode/SystemResult.txt")
-	checkErr(err)
-	userResult, err := ioutil.ReadFile("./phpOJ/subject-1/SysTmpCode/zzm/UserResult.txt")
-	checkErr(err)
-	sys := strings.Split(string(sysResult), "\n")
-	user := string(userResult)
-	for _, v := range sys {
-		if !strings.Contains(user, v) {
+func CheckProject1Answer(result Result) (b bool) {
+	for _, v := range result.SystemResult {
+		if !strings.Contains(result.UserResult, v) {
 			b = false
 			return
 		}

@@ -101,8 +101,10 @@ func Commit(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(tu)
 	phpOJ.GitPull(tu.Repository, tu.Openid)
 	phpOJ.GenerateProject1Code(tu.Openid, tp.CheckoutPath)
-	defer phpOJ.GitCheckOut(tu.Openid)
-	WriteJson(w, "Accept")
+	// defer phpOJ.GitCheckOut(tu.Openid)
+	result := phpOJ.RunProject1(tu.Openid, tp.CheckoutPath)
+	b := phpOJ.CheckProject1Answer(result)
+	WriteJson(w, b)
 }
 
 func WriteJson(w http.ResponseWriter, data interface{}) {
