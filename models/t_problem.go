@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -38,36 +39,35 @@ type TProblem struct {
 // 	_, err = stmt.Exec()
 // 	checkErr(err)
 // }
-// func Select() (ts []TProblem) {
-// 	rows, err := db.Query("select * from t_problem")
-// 	checkErr(err)
-// 	for rows.Next() {
-// 		var t TProblem
-// 		var Id sql.NullInt64
-// 		var Title sql.NullString
-// 		var Description sql.NullString
-// 		var Type sql.NullString
-// 		var CodeType sql.NullString
-// 		var CheckoutPath sql.NullString
-// 		var AttachCode sql.NullString
-// 		var AttachFile sql.NullString
-// 		var Answer sql.NullString
-// 		var Status bool
-// 		var CreateTime time.Time
-// 		err := rows.Scan(&Id, &Title, &Description, &Type, &CodeType, &CheckoutPath, &AttachCode, &AttachFile, &Answer, &Status, &CreateTime)
-// 		checkErr(err)
-// 		t.Id = Id.Int64
-// 		t.Title = Title.String
-// 		t.Description = Description.String
-// 		t.Type = Type.String
-// 		t.CodeType = CodeType.String
-// 		t.CheckoutPath = CheckoutPath.String
-// 		t.AttachCode = AttachCode.String
-// 		t.AttachFile = AttachFile.String
-// 		t.Answer = Answer.String
-// 		t.Status = Status
-// 		t.CreateTime = CreateTime
-// 		ts = append(ts, t)
-// 	}
-// 	return
-// }
+func SelectProblem(pid int) (t TProblem) {
+	rows, err := db.Query("select id,title,description,type,code_type,checkout_path,attach_code,attach_file,answer,status,create_time from t_problem where id = $1", pid)
+	checkErr(err)
+	defer rows.Close()
+	if rows.Next() {
+		var Id sql.NullInt64
+		var Title sql.NullString
+		var Description sql.NullString
+		var Type sql.NullString
+		var CodeType sql.NullString
+		var CheckoutPath sql.NullString
+		var AttachCode sql.NullString
+		var AttachFile sql.NullString
+		var Answer sql.NullString
+		var Status bool
+		var CreateTime time.Time
+		err := rows.Scan(&Id, &Title, &Description, &Type, &CodeType, &CheckoutPath, &AttachCode, &AttachFile, &Answer, &Status, &CreateTime)
+		checkErr(err)
+		t.Id = Id.Int64
+		t.Title = Title.String
+		t.Description = Description.String
+		t.Type = Type.String
+		t.CodeType = CodeType.String
+		t.CheckoutPath = CheckoutPath.String
+		t.AttachCode = AttachCode.String
+		t.AttachFile = AttachFile.String
+		t.Answer = Answer.String
+		t.Status = Status
+		t.CreateTime = CreateTime
+	}
+	return
+}

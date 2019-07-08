@@ -17,12 +17,11 @@ const (
 	PHP=$(pwd)
 	sudo docker run \
 		--rm \
-		-v $PHP/UserCode:/UserCode \
-		-v $PHP/phpOJ/subject-1/SysTmpCode:/SysTmpCode \
+		-v $PHP+$0:/Code \
 		php:alpine \
 		/bin/sh -c '\
 
-			userResult=$(php /UserCode/zzm/test-UserCode.php); \
+			userResult=$(php /Code/subject1.php); \
 			result=$(echo $userResult | grep "error:"); \
 			if [ $result != "" ];then \
 				echo -n "\"userResult\":\""; \
@@ -33,7 +32,7 @@ const (
 				echo -n $userResult; \
 				echo -n "\","; \
 				echo -n "\"systemResult\":"; \
-				sysResult=$(php /SysTmpCode/SystemCode.php); \
+				sysResult=$(php /Code/SystemCode.php); \
 				echo -n $sysResult; \
 			fi \
 
@@ -47,10 +46,12 @@ type Result struct {
 	SystemResult []string `json:"systemResult"`
 }
 
-func RunProject1() {
+func RunProject1(openid string, checkout_path string) {
+	codeUrl := fmt.Sprintf("/userData/%s%s", openid, checkout_path)
 	params := make([]string, 2)
 	params[0] = "-c"
 	params[1] = dockerRun
+	params[2] = codeUrl
 	// re是一个json格式的结果
 	re, err := execCommand("bash", params)
 	checkErr(err)
@@ -61,8 +62,9 @@ func RunProject1() {
 	fmt.Println(result)
 }
 
-func GenerateProject1Code() {
-	phpfile, err := os.Create("./phpOJ/subject-1/SysTmpCode/SystemCode.php")
+func GenerateProject1Code(openid string, checkout_path string) {
+	codeUrl := fmt.Sprintf("./userData/%s%s", openid, checkout_path)
+	phpfile, err := os.Create(codeUrl + "SystemCode.php")
 	checkErr(err)
 	defer phpfile.Close()
 	url := "https://blog.csdn.net/YDTG1993/article/details/83861629"
