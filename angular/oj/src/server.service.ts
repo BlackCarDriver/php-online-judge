@@ -30,5 +30,5 @@ export class Problem {
   try: number;
   ac: number;
   rate: string;
-  leave: string;
+  level: string;
 }

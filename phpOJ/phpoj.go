@@ -10,7 +10,7 @@ import (
 
 const (
 	shellPath  = "./shell"
-	userCodePath = ""
+	userCodePath = "./UserCode"
 )
 
 var (
@@ -53,7 +53,7 @@ func init(){
 		"https://www.jb51.net/list/list_172_1.htm",
 		"http://www.fhdq.net/emoji/emojifuhao.html",
 		"https://www.oschina.net/",
-	}
+	} 
 	probemTemplate = `
 	Here we create an array a that will hold exactly 5 ints. 
 	The type of elements and length are both part of the array’s type. 
@@ -67,12 +67,12 @@ func init(){
 type Problem struct {
 	Text string	`json:"text"`
 	Time string `json:"time"`
-	Type  string `json:"type"`;
-	Tag   string `json:"tag"`;
-	Try    int `json:"try"`;
-	Ac     int `json:"ac"`;
-	Rate  string `json:"rate"`;
-	Leave  string `json:"leave"`; 
+	Type  string `json:"type"`
+	Tag   string `json:"tag"`
+	Try    int `json:"try"`
+	Ac     int `json:"ac"`
+	Rate  string `json:"rate"`
+	Level  string `json:"level"`
 }
 
 //distribute different url of target website to user by uesr's id
@@ -94,7 +94,7 @@ func GetProblem(id string) Problem {
 	problem_url := getUrlById(id)
 	github_url := getGitUrlById(id)
 	//the following message should get from database
-	temp := Problem{Text:"", Time:"2019-6-6", Type:"PHP", Tag:"网络爬虫", Try:133, Ac:40, Leave:"⭐⭐⭐⭐"}
+	temp := Problem{Text:"", Time:"2019-6-6", Type:"PHP", Tag:"网络爬虫", Try:133, Ac:40, Level:"⭐⭐⭐⭐"}
 	temp.Rate = fmt.Sprintf("%%%.1f", float32(temp.Ac*100/temp.Try))
 	temp.Text = fmt.Sprintf(probemTemplate, problem_url, github_url)
 	temp.Text = strings.Replace(temp.Text, "\n", "<br>",-1)
@@ -107,7 +107,11 @@ func updataCodeById(id string) error {
 	args := make([]string, 3)
 	args[0] = "-c"
 	args[1] = fmt.Sprintf(`cd %s && git clone %s`, userCodePath, gitUrl)
-	//err := execCommand("bash", args)
-	fmt.Println("user code already pulled!....")
+	res,err := execCommand("bash", args)
+	if err != nil {
+		fmt.Println(err)
+	}else{
+		fmt.Println(res)
+	}
 	return nil
 }

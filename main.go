@@ -11,7 +11,9 @@ import (
 )
 
 func main() {
-	Server()
+	// Server()
+	phpOJ.Ttest()
+	os.Exit(1)
 	defer func() {
 		if err, ok := recover().(error); ok {
 			fmt.Println(err)
