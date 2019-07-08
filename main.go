@@ -4,52 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"time"
-	"os"
+
+	"./models"
 	"./phpOJ"
 )
 
 func main() {
-	Server()
-	defer func() {
-		if err, ok := recover().(error); ok {
-			fmt.Println(err)
-		}
-	}()
-	phpOJ.GenerateProject1Code()
-	phpOJ.RunProject1()
-	// b := phpOJ.CheckProject1Answer()
-	// fmt.Println(b)
-
-	// models.InitDB()
-	// mux := http.NewServeMux()
+	models.DBinit()
+	mux := http.NewServeMux()
 
 	// mux.HandleFunc("/example", errorHander(example))
-
-	// fmt.Println("http服务器启动，端口：8083")
-	// err := http.ListenAndServe(":8083", mux)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println("==")
-}
-
-func example(w http.ResponseWriter, r *http.Request) {
-	setHeader(w)
-	data := getBodyData(r)
-	if userName, ok := data["userName"].(string); ok {
-		fmt.Println(userName)
-
-		phpOJ.GenerateProject1Code()
-		phpOJ.RunProject1()
-		b := phpOJ.CheckProject1Answer()
-		fmt.Println(b)
-	} else {
-		panic("type assertion has error")
+	mux.HandleFunc("/getproblem", errorHander(GetProblem))
+	mux.HandleFunc("/commit", errorHander(Commit))
+	fmt.Println("http服务器启动，端口：8083")
+	err := http.ListenAndServe(":8083", mux)
+	if err != nil {
+		log.Fatal(err)
 	}
-	// fmt.Println("is Success")
-
 }
 
 func setHeader(w http.ResponseWriter) {
@@ -71,6 +44,7 @@ func errorHander(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err, ok := recover().(error); ok {
+				fmt.Println(err)
 				http.Error(w, err.Error(), 500)
 			}
 		}()
@@ -84,60 +58,44 @@ func checkErr(err error) {
 	}
 }
 
-
 //================================================================ 7-7
-
-func Server(){
-	mux := http.NewServeMux()
-	mux.HandleFunc("/getproblem", GetProblem)
-	mux.HandleFunc("/commit", Commit)
-
-	server := &http.Server{
-		Addr:           "localhost:6666",
-		ReadTimeout:    time.Second * 10,
-		WriteTimeout:   time.Second * 10,
-		Handler:        mux,
-		MaxHeaderBytes: 1 << 20,
-	}
-	fmt.Println("Begin to Listen!!")
-	err := server.ListenAndServe()
-	if err != nil {
-		fmt.Println(err)
-	}
-	os.Exit(0)
-}
 
 //http://localhost:6666/getproblem
 //provide the problem's data to defferent user and problem
-func GetProblem(w http.ResponseWriter, r *http.Request){
-	SetHeader(w)
-	body, _ := ioutil.ReadAll(r.Body)
-	if len(body)==0 {
-		return
+func GetProblem(w http.ResponseWriter, r *http.Request) {
+	setHeader(w)
+	body := getBodyData(r)
+	pid, ok := body["pid"].(float64)
+	if !ok {
+		err := fmt.Errorf("type assertion has error")
+		panic(err)
 	}
-	ssmap := getBodyMap(body)
-	problemid := ssmap["pid"]
-	userid := ssmap["uid"]
-	tp := phpOJ.Problem{}
-	if problemid=="" || userid=="" {
-		WriteJson(w, tp)
-	}
-	tp = phpOJ.GetProblem(userid)
+
+	tp := models.SelectProblem(int(pid))
+	fmt.Println(tp)
 	WriteJson(w, tp)
 }
 
 //http://localhost:6666/commit
 //pull or update user's code from github and then judge and return the result
-func Commit(w http.ResponseWriter, r *http.Request){
-	SetHeader(w)
-	body, _ := ioutil.ReadAll(r.Body)
-	if len(body)==0 {
-		return
+func Commit(w http.ResponseWriter, r *http.Request) {
+	setHeader(w)
+	body := getBodyData(r)
+	uid, ok := body["uid"].(string)
+	pid, ok := body["pid"].(float64)
+	if !ok {
+		err := fmt.Errorf("type assertion has error")
+		panic(err)
 	}
-	ssmap := getBodyMap(body)
-	fmt.Println(ssmap)
-	//do something ....
-	WriteJson(w,"Accept")
+	tp := models.SelectProblem(int(pid))
+	tu := models.SelectUser(uid)
+	phpOJ.GitPull(tu.Repository, tu.Openid)
+	phpOJ.GenerateProject1Code(tu.Openid, tp.CheckoutPath)
+	// defer phpOJ.GitCheckOut(tu.Openid)
+	result := phpOJ.RunProject1(tu.Openid, tp.CheckoutPath)
+
+	b := phpOJ.CheckProject1Answer(result)
+	WriteJson(w, b)
 }
 
 func WriteJson(w http.ResponseWriter, data interface{}) {
@@ -146,16 +104,4 @@ func WriteJson(w http.ResponseWriter, data interface{}) {
 		fmt.Println(err)
 	}
 	w.Write(jsondata)
-}
-
-func SetHeader(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "content-type")
-}
-
-//parse request.Body to an string-string map
-func getBodyMap(body []byte) map[string]string {
-	var postbody map[string]string
-	json.Unmarshal(body, &postbody)
-	return postbody
 }

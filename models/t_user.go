@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -32,28 +33,27 @@ type TUser struct {
 // 	_, err = stmt.Exec()
 // 	checkErr(err)
 // }
-// func Select() (ts []TUser) {
-// 	rows, err := db.Query("select * from t_user")
-// 	checkErr(err)
-// 	for rows.Next() {
-// 		var t TUser
-// 		var Openid sql.NullString
-// 		var Nickname sql.NullString
-// 		var AvatarUrl sql.NullString
-// 		var GitAccount sql.NullString
-// 		var GitPassword sql.NullString
-// 		var Repository sql.NullString
-// 		var CreateTime time.Time
-// 		err := rows.Scan(&Openid, &Nickname, &AvatarUrl, &GitAccount, &GitPassword, &Repository, &CreateTime)
-// 		checkErr(err)
-// 		t.Openid = Openid.String
-// 		t.Nickname = Nickname.String
-// 		t.AvatarUrl = AvatarUrl.String
-// 		t.GitAccount = GitAccount.String
-// 		t.GitPassword = GitPassword.String
-// 		t.Repository = Repository.String
-// 		t.CreateTime = CreateTime
-// 		ts = append(ts, t)
-// 	}
-// 	return
-// }
+func SelectUser(uid string) (t TUser) {
+	rows, err := db.Query("select openid,nickname,avatar_url,git_account,git_password,repository,create_time from t_user where openid=$1", uid)
+	checkErr(err)
+	defer rows.Close()
+	if rows.Next() {
+		var Openid sql.NullString
+		var Nickname sql.NullString
+		var AvatarUrl sql.NullString
+		var GitAccount sql.NullString
+		var GitPassword sql.NullString
+		var Repository sql.NullString
+		var CreateTime time.Time
+		err := rows.Scan(&Openid, &Nickname, &AvatarUrl, &GitAccount, &GitPassword, &Repository, &CreateTime)
+		checkErr(err)
+		t.Openid = Openid.String
+		t.Nickname = Nickname.String
+		t.AvatarUrl = AvatarUrl.String
+		t.GitAccount = GitAccount.String
+		t.GitPassword = GitPassword.String
+		t.Repository = Repository.String
+		t.CreateTime = CreateTime
+	}
+	return
+}
