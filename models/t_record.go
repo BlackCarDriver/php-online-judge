@@ -12,6 +12,12 @@ type TRecord struct {
 	CreateTime   time.Time `json:"create_time"`
 }
 
+//get user commit histroy from database and pack it
+func GetUserHistory(pid float64, uid string) string {
+	//do something ...
+	return " It is commit history mock data ..."
+}
+
 // func (t *TRecord) Insert() {
 // 	stmt, err := db.Prepare("insert into t_record(problem_id,openid,commit_hash,answer_status,create_time) values ($1,$2,$3,$4,$5)")
 // 	checkErr(err)

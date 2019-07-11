@@ -8,8 +8,8 @@ import { Time } from '@angular/common';
 
 export class ServerService {
   constructor(private http: HttpClient) { }
-  root = "http://192.168.52.128:8083";
-
+  // root = "http://192.168.52.128:8083";
+  root = "http://localhost:8083";
   getProblem(problemid: number, userid: string) {
     var turl = this.root + "/getproblem";
     var postBody = { pid: problemid, uid: userid };
@@ -21,6 +21,14 @@ export class ServerService {
     var postBody = { pid: problemid, uid: userid };
     return this.http.post<any>(turl, JSON.stringify(postBody));
   }
+
+  getHistroy(problemid: number, userid: string) {
+    var turl = this.root + "/gethistory";
+    var postBody = { pid: problemid, uid: userid };
+    //暂时用字符串传送答题历史...
+    return this.http.post<string>(turl, JSON.stringify(postBody));
+  }
+  
 }
 
 export class Problem {
@@ -35,4 +43,9 @@ export class Problem {
   answer: string
   status: boolean
   createTime: Time
+}
+
+export class CommitHistory {
+  time:string;
+  result:string;
 }

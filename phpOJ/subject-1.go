@@ -3,6 +3,7 @@ package phpOJ
 import (
 	"encoding/json"
 	"fmt"
+	"hash/crc32"
 	"os"
 	"strings"
 	"text/template"
@@ -32,6 +33,31 @@ const (
 		';
 	`
 )
+
+//list of target url in subject-1
+var PHPSubject1Url = []string{
+	"https://blog.csdn.net/YDTG1993/article/details/83861629",
+	"https://studygolang.com/articles/16010?fr=sidebar",
+	"https://www.csdn.net",
+	"https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+	"https://beego.me/docs/intro",
+	"https://gocn.vip",
+}
+
+//distribut target url randomly by user id
+func PHPSubject1GetUrl(id string) string {
+	idHash := int(crc32.ChecksumIEEE([]byte(id)))
+	if idHash < 0 {
+		idHash = -idHash
+	}
+	return PHPSubject1Url[idHash%len(PHPSubject1Url)]
+}
+
+//return the url which user should upload their answer to
+func GetUerGitUrl(problemid float64, userid string) string {
+	//do something...
+	return "<b>https://github.com/xxxx</b>"
+}
 
 type Result struct {
 	UserResult   string   `json:"userResult"`
@@ -64,7 +90,8 @@ func GenerateProject1Code(openid string, checkout_path string) {
 	phpfile, err := os.Create(codeUrl + "SystemCode.php")
 	checkErr(err)
 	defer phpfile.Close()
-	url := "https://blog.csdn.net/YDTG1993/article/details/83861629"
+	url := PHPSubject1GetUrl(openid)
+	//url := "https://blog.csdn.net/YDTG1993/article/details/83861629"
 	tmpl, err := template.ParseFiles("./phpOJ/subject-1/SysTmpCode/php-template.txt")
 	checkErr(err)
 	err = tmpl.Execute(phpfile, url)

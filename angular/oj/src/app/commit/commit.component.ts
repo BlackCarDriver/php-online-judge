@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Problem, ServerService } from '../../server.service';
+import { Time } from '@angular/common';
 
 @Component({
   selector: 'app-commit',
@@ -29,20 +30,22 @@ export class CommitComponent implements OnInit {
   getProblemText() {
     this.server.getProblem(this.problemid, this.userid).subscribe(result => {
       this.tp = result;
-      console.log(JSON.stringify(this.tp))
-    }
-    )
+      let que_text = document.getElementById("que-text");
+      que_text.innerHTML = this.tp.description;
+      // console.log(JSON.stringify(this.tp))
+    });
   }
 
   //通知后端判断上传的代码是否正确，又 题目id和用户id确定一个github 地址
   commit() {
     this.server.commit(this.problemid, this.userid).subscribe(result => {
       this.result = result;
-    }
-    )
+    });
   }
   //将用户的答题状况记录显示到页面上
   getHistroy() {
-    this.history = "时间： 2019-07-07 结果： 成功通过！";
+    this.server.getHistroy(this.problemid, this.userid).subscribe(result=> {
+      this.history = result;
+    });
   }
 }
