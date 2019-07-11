@@ -6,10 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"os"
-
 	"../models"
-	"../phpOJ"
 )
 
 //http://..../getproblem
@@ -17,15 +14,14 @@ import (
 func GetProblem(w http.ResponseWriter, r *http.Request) {
 	setHeader(w)
 	body := getBodyData(r)
-	pid, ok := body["pid"].(float64)
+	pid, ok1 := body["pid"].(float64) //use float type to receive typescript number type
 	uid, ok2 := body["uid"].(string)
-	if !ok || !ok2 {
-		panic("can not find pid and uid in require body...")
+	if !ok1 || !ok2 {
+		return
+		//panic("GetProblem() can not find pid and uid in require body...")
 	}
-	tp := models.SelectProblem(int(pid))
-	targeturl := phpOJ.PHPSubject1GetUrl(uid)
-	giturl := phpOJ.GetUerGitUrl(pid, uid)
-	tp.Description = fmt.Sprintf(tp.Description, targeturl, giturl)
+	tp, err := OJS[int(pid)].GetProblem(int(pid), uid)
+	checkErr(err)
 	WriteJson(w, tp)
 }
 
@@ -34,20 +30,15 @@ func GetProblem(w http.ResponseWriter, r *http.Request) {
 func Commit(w http.ResponseWriter, r *http.Request) {
 	setHeader(w)
 	body := getBodyData(r)
-	uid, ok1 := body["uid"].(string)
-	pid, ok2 := body["pid"].(float64)
+	pid, ok1 := body["pid"].(float64)
+	uid, ok2 := body["uid"].(string)
 	if !ok1 || !ok2 {
-		panic("can not find pid and uid in require body...")
+		// panic("Commit() can not find pid and uid in require body...")
+		return
 	}
-	tp := models.SelectProblem(int(pid))
-	tu := models.SelectUser(uid)
-	//phpOJ.GitPull(tu.Repository, tu.Openid)
-	phpOJ.GenerateProject1Code(tu.Openid, tp.CheckoutPath)
-	os.Exit(1)
-	// defer phpOJ.GitCheckOut(tu.Openid)
-	result := phpOJ.RunProject1(tu.Openid, tp.CheckoutPath)
-	b := phpOJ.CheckProject1Answer(result)
-	WriteJson(w, b)
+	res, err := OJS[int(pid)].Commit(int(pid), uid)
+	checkErr(err)
+	WriteJson(w, res)
 }
 
 //http://...../gethistory
@@ -58,25 +49,23 @@ func GetHistory(w http.ResponseWriter, r *http.Request) {
 	pid, ok1 := body["pid"].(float64)
 	uid, ok2 := body["uid"].(string)
 	if !ok1 || !ok2 {
-		panic("can not find pid and uid in require body...")
+		// panic("GetHistory can not find pid and uid in require body...")
+		return
 	}
-	history := models.GetUserHistory(pid, uid)
-	WriteJson(w, history)
+	res, err := models.GetHistory(int(pid), uid)
+	checkErr(err)
+	WriteJson(w, res)
 }
 
-//============== tool function ====================
-
-func ErrorHander(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err, ok := recover().(error); ok {
-				fmt.Println(err)
-				http.Error(w, err.Error(), 500)
-			}
-		}()
-		h(w, r)
-	}
+//http://...../getproblemlist
+//return the list of problem
+func GetProblemList(w http.ResponseWriter, r *http.Request) {
+	list := make([]string, 0)
+	//do something...
+	WriteJson(w, list)
 }
+
+//================================ tool function ====================
 
 func setHeader(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")                           //允许访问所有域

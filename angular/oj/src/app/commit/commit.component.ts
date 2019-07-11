@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Problem, ServerService } from '../../server.service';
-import { Time } from '@angular/common';
+import { Problem, ServerService, CommitHistory } from '../../server.service';
 
 @Component({
   selector: 'app-commit',
@@ -13,7 +12,7 @@ export class CommitComponent implements OnInit {
   constructor(private server: ServerService) { }
   tp = new Problem;
   result = "";
-  history = "";
+  history = new CommitHistory;
   problemid: number;
   userid = "";
 
@@ -48,4 +47,5 @@ export class CommitComponent implements OnInit {
       this.history = result;
     });
   }
+
 }

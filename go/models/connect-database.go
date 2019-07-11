@@ -17,7 +17,7 @@ const (
 	dbname   = "ard"
 )
 
-func DBinit() {
+func init() {
 	var err error
 	//打开数据库
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
