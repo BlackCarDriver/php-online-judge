@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -27,11 +28,15 @@ func (this *WebCrawler) GetProblem(pid int, uid string) (data models.Problem, er
 func (this *WebCrawler) Commit(pid int, uid string) (result models.Result, err error) {
 	tp := models.SelectProblem(pid)
 	tu := models.SelectUser(uid)
+	fmt.Println("bging to git pull")
 	GitPull(tu.Repository, tu.Openid)
-	fmt.Println("git pull scuess!!!")
+	fmt.Println("begin to make project1 code")
 	models.GenerateProject1Code(tu.Openid, tp.CheckoutPath)
+	fmt.Println("begin to run project1")
 	tresult := RunProject1(tu.Openid, tp.CheckoutPath)
+	fmt.Println("begin to check project1")
 	b := CheckProject1Answer(tresult)
+	result.Time = "2019-11-11 (mock-data)"
 	if b {
 		result.Describe = "scuess!"
 	} else {
@@ -55,7 +60,7 @@ const (
 	PHP=$(pwd)
 	sudo docker run \
 		--rm \
-		-v $PHP$0:/Code \
+		-v $0:/Code \
 		php:alpine \
 		/bin/sh -c '\
 
@@ -74,17 +79,16 @@ const (
 )
 
 func RunProject1(openid string, checkout_path string) (result judgeResult) {
-	codeUrl := fmt.Sprintf("/userData/%s%s", openid, checkout_path)
+	codeUrl := fmt.Sprintf("%s/%s%s", models.UserCodePath, openid, checkout_path)
+	fmt.Println("codeUrl : ", codeUrl)
 	params := make([]string, 3)
 	params[0] = "-c"
 	params[1] = dockerRun
 	params[2] = codeUrl
 	// re是一个json格式的结果
 	r, err := execCommand("bash", params)
-	// fmt.Println(r)
 	checkErr(err)
 	re := strings.Split(r, "\n")
-	// fmt.Println(len(re))
 	result.UserResult = re[0]
 	json.Unmarshal([]byte(re[1]), &result.SystemResult)
 	//将json转化为结构体
@@ -124,17 +128,25 @@ func execCommand(commandName string, params []string) (result string, err error)
 func GitCheckOut(openid string) {
 	args := make([]string, 2)
 	args[0] = "-c"
-	args[1] = fmt.Sprintf("cd ./userData/%s && git checkout .", openid)
+	args[1] = fmt.Sprintf("cd %s/%s && git checkout .", models.UserCodePath, openid)
 	result, err := execCommand("/bin/bash", args)
-	checkErr(err)
+	// checkErr(err)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(result)
 }
 
 func GitPull(gitUrl string, openid string) {
+	fmt.Println("openid: ", openid, "   git url :", gitUrl)
 	args := make([]string, 2)
 	args[0] = "-c"
-	args[1] = fmt.Sprintf("cd ./userCode/%s && git pull %s", openid, gitUrl)
+	args[1] = fmt.Sprintf("cd %s/%s && git pull --rebase %s", models.UserCodePath, openid, gitUrl)
 	result, err := execCommand("/bin/bash", args)
-	checkErr(err)
+	// checkErr(err)
+	if err != nil {
+		fmt.Println("GitPull() fall : ", err)
+		os.Exit(1)
+	}
 	fmt.Println(result)
 }

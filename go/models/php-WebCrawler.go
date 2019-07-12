@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+const (
+	UserCodePath = `/home/ubuntu/Desktop/userCode`
+)
+
 //list of target url in subject-1
 var PHPSubject1Url = []string{
 	"https://blog.csdn.net/YDTG1993/article/details/83861629",
@@ -29,7 +33,7 @@ func PHPSubject1GetUrl(id string) string {
 }
 
 func GenerateProject1Code(openid string, checkout_path string) {
-	codeUrl := fmt.Sprintf("./userCode/%s%s", openid, checkout_path)
+	codeUrl := fmt.Sprintf("%s/%s%s", UserCodePath, openid, checkout_path)
 	phpfile, err := os.Create(codeUrl + "SystemCode.php")
 	checkErr(err)
 	defer phpfile.Close()
